@@ -82,6 +82,13 @@ class ScoreBoardTest {
         assertEquals("Home or away score cannot be negative", exception.getMessage());
     }
 
+    @Test
+    void attemptToUpdateMatchNotFoundInScoreBoardThrowsAnException() {
+        // When & Then
+        var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.updateScore(ANY_HOME_TEAM, ANY_AWAY_TEAM, 2, 2));
+        assertEquals("Mexico - Canada match not found in score board", exception.getMessage());
+    }
+
     static Stream<String> blankAndNullStringProvider() {
         return Stream.of("", " ", null);
     }
