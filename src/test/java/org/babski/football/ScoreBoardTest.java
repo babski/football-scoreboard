@@ -3,6 +3,7 @@ package org.babski.football;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
@@ -68,6 +69,17 @@ class ScoreBoardTest {
         // Then
         assertEquals(1, scoreBoard.getSummary().size());
         assertEquals("Mexico 1 - Canada 2", scoreBoard.getSummary().getFirst());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"-1, -1", "-1, 0", "0, -1"})
+    void attemptToUpdateMatchWithNegativeScoresThrowsAnException(int homeScore, int awayScore) {
+        // Given
+        scoreBoard.startMatch(ANY_HOME_TEAM, ANY_AWAY_TEAM);
+
+        // When & Then
+        var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.updateScore(ANY_HOME_TEAM, ANY_AWAY_TEAM, homeScore, awayScore));
+        assertEquals("Home or away score cannot be negative", exception.getMessage());
     }
 
     static Stream<String> blankAndNullStringProvider() {

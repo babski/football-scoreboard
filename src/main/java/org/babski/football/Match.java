@@ -12,6 +12,9 @@ record Match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
         if (homeTeam.equals(awayTeam)) {
             throw new IllegalArgumentException("Home and away teams cannot be the same");
         }
+        if (homeScore < 0 || awayScore < 0) {
+            throw new IllegalArgumentException("Home or away score cannot be negative");
+        }
     }
 
     Match(String homeTeam, String awayTeam) {
