@@ -57,6 +57,19 @@ class ScoreBoardTest {
         assertEquals(0, scoreBoard.getSummary().size());
     }
 
+    @Test
+    void nonNegativeTeamsScoresAreUpdateOnScoreBoard() {
+        // Given
+        scoreBoard.startMatch(ANY_HOME_TEAM, ANY_AWAY_TEAM);
+
+        // When
+        scoreBoard.updateScore(ANY_HOME_TEAM, ANY_AWAY_TEAM, 1, 2);
+
+        // Then
+        assertEquals(1, scoreBoard.getSummary().size());
+        assertEquals("Mexico 1 - Canada 2", scoreBoard.getSummary().getFirst());
+    }
+
     static Stream<String> blankAndNullStringProvider() {
         return Stream.of("", " ", null);
     }

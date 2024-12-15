@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 class SimpleScoreBoard implements ScoreBoard {
 
@@ -23,7 +24,8 @@ class SimpleScoreBoard implements ScoreBoard {
 
     @Override
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
-
+        Match updatedMatch = new Match(homeTeam, awayTeam, homeScore, awayScore);
+        findMatchInstant(homeTeam, awayTeam).ifPresent(instant -> matches.put(instant, updatedMatch));
     }
 
     @Override
@@ -36,5 +38,12 @@ class SimpleScoreBoard implements ScoreBoard {
         return matches.values().stream()
                 .map(Match::toString)
                 .toList();
+    }
+
+    private Optional<Instant> findMatchInstant(String homeTeam, String awayTeam) {
+        return matches.entrySet().stream()
+                .filter(matchEntry -> homeTeam.equals(matchEntry.getValue().homeTeam()) && awayTeam.equals(matchEntry.getValue().awayTeam()))
+                .map(Map.Entry::getKey)
+                .findFirst();
     }
 }
