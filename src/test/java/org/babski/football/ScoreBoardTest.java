@@ -5,12 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 class ScoreBoardTest {
 
@@ -107,7 +113,7 @@ class ScoreBoardTest {
     }
 
     @Test
-    void attemptToFinishMatchThatIsInScoreBoardEndsUpWithSuccess(){
+    void attemptToFinishMatchThatIsInScoreBoardEndsUpWithSuccess() {
         // Given
         scoreBoard.startMatch("Brazil", "Argentina");
         scoreBoard.startMatch(ANY_HOME_TEAM, ANY_AWAY_TEAM);
@@ -127,6 +133,38 @@ class ScoreBoardTest {
         // When & Then
         var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.finishMatch(ANY_HOME_TEAM, ANY_AWAY_TEAM));
         assertEquals("Mexico - Canada match not found in score board", exception.getMessage());
+    }
+
+    @Test
+    void gettingSummaryOfMatchesInProgressIsOrderedByTotalAndReturnedByMostRecentlyStarted() {
+        // Given
+        Clock mockClock = Mockito.mock(Clock.class);
+        Instant now = Instant.now();
+        AtomicInteger counter = new AtomicInteger(0);
+        when(mockClock.instant()).thenAnswer(invocation -> now.plusSeconds(counter.getAndIncrement()));
+        ((SimpleScoreBoard) scoreBoard).setClock(mockClock);
+
+        scoreBoard.startMatch("Mexico", "Canada");
+        scoreBoard.startMatch("Spain", "Brazil");
+        scoreBoard.startMatch("Germany", "France");
+        scoreBoard.startMatch("Uruguay", "Italy");
+        scoreBoard.startMatch("Argentina", "Australia");
+        scoreBoard.updateScore("Argentina", "Australia", 3, 1);
+        scoreBoard.updateScore("Uruguay", "Italy", 6, 6);
+        scoreBoard.updateScore("Germany", "France", 2, 2);
+        scoreBoard.updateScore("Spain", "Brazil", 10, 2);
+        scoreBoard.updateScore("Mexico", "Canada", 0, 5);
+
+        // When
+        List<String> summary = scoreBoard.getSummary();
+
+        // Then
+        assertEquals(5, summary.size());
+        assertEquals("Uruguay 6 - Italy 6", summary.get(0));
+        assertEquals("Spain 10 - Brazil 2", summary.get(1));
+        assertEquals("Mexico 0 - Canada 5", summary.get(2));
+        assertEquals("Argentina 3 - Australia 1", summary.get(3));
+        assertEquals("Germany 2 - France 2", summary.get(4));
     }
 
     static Stream<String> blankAndNullStringProvider() {

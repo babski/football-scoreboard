@@ -3,6 +3,7 @@ package org.babski.football;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,15 @@ import java.util.stream.Stream;
 class SimpleScoreBoard implements ScoreBoard {
 
     private final Map<Instant, Match> matches = new HashMap<>();
-    private final Clock clock;
     private final ScoreBoardValidator scoreBoardValidator = new ScoreBoardValidator();
+    private Clock clock;
 
-    public SimpleScoreBoard() {
+    SimpleScoreBoard() {
         this.clock = Clock.systemUTC();
+    }
+
+    void setClock(Clock clock) {
+        this.clock = clock;
     }
 
     @Override
@@ -39,9 +44,15 @@ class SimpleScoreBoard implements ScoreBoard {
 
     @Override
     public List<String> getSummary() {
-        return matches.values().stream()
-                .map(Match::toString)
+        return matches.entrySet().stream()
+                .sorted(Comparator.comparing(this::getMatchTotalScore).reversed()
+                        .thenComparing(Map.Entry::getKey, Comparator.reverseOrder()))
+                .map(entry -> entry.getValue().toString())
                 .toList();
+    }
+
+    private int getMatchTotalScore(Map.Entry<Instant, Match> entry) {
+        return entry.getValue().homeScore() + entry.getValue().awayScore();
     }
 
     private Instant findMatchInstantOrThrow(String homeTeam, String awayTeam) {
@@ -55,7 +66,7 @@ class SimpleScoreBoard implements ScoreBoard {
     private class ScoreBoardValidator {
         void validateTeamsAreNotInScoreboard(String homeTeam, String awayTeam) {
             String existingTeams = matches.values().stream()
-                    .filter(isAnyTeamOnScoreBoard(homeTeam, awayTeam))
+                    .filter(isAnyTeamInScoreBoard(homeTeam, awayTeam))
                     .flatMap(match -> Stream.of(match.homeTeam(), match.awayTeam()))
                     .filter(team -> team.equals(homeTeam) || team.equals(awayTeam))
                     .distinct()
@@ -67,7 +78,7 @@ class SimpleScoreBoard implements ScoreBoard {
             }
         }
 
-        private Predicate<Match> isAnyTeamOnScoreBoard(String homeTeam, String awayTeam) {
+        private Predicate<Match> isAnyTeamInScoreBoard(String homeTeam, String awayTeam) {
             return match -> match.homeTeam().equals(homeTeam) || match.awayTeam().equals(homeTeam)
                     || match.homeTeam().equals(awayTeam) || match.awayTeam().equals(awayTeam);
         }
