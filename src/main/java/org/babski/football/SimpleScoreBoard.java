@@ -34,7 +34,7 @@ class SimpleScoreBoard implements ScoreBoard {
 
     @Override
     public void finishMatch(String homeTeam, String awayTeam) {
-
+        matches.remove(findMatchInstantOrThrow(homeTeam, awayTeam));
     }
 
     @Override

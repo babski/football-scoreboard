@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ScoreBoardTest {
 
@@ -103,6 +104,22 @@ class ScoreBoardTest {
         // When & Then
         var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.updateScore(ANY_HOME_TEAM, ANY_AWAY_TEAM, 2, 2));
         assertEquals("Mexico - Canada match not found in score board", exception.getMessage());
+    }
+
+    @Test
+    void attemptToFinishMatchThatIsInScoreBoardEndsUpWithSuccess(){
+        // Given
+        scoreBoard.startMatch("Brazil", "Argentina");
+        scoreBoard.startMatch(ANY_HOME_TEAM, ANY_AWAY_TEAM);
+        scoreBoard.startMatch("England", "Spain");
+
+        // When
+        scoreBoard.finishMatch(ANY_HOME_TEAM, ANY_AWAY_TEAM);
+
+        // Then
+        assertEquals(2, scoreBoard.getSummary().size());
+        assertTrue(scoreBoard.getSummary().contains("Brazil 0 - Argentina 0"));
+        assertTrue(scoreBoard.getSummary().contains("England 0 - Spain 0"));
     }
 
     static Stream<String> blankAndNullStringProvider() {
