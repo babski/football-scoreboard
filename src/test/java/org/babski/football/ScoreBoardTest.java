@@ -122,6 +122,13 @@ class ScoreBoardTest {
         assertTrue(scoreBoard.getSummary().contains("England 0 - Spain 0"));
     }
 
+    @Test
+    void attemptToFinishMatchThatIsNotInOnScoreBoardThrowsAnException() {
+        // When & Then
+        var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.finishMatch(ANY_HOME_TEAM, ANY_AWAY_TEAM));
+        assertEquals("Mexico - Canada match not found in score board", exception.getMessage());
+    }
+
     static Stream<String> blankAndNullStringProvider() {
         return Stream.of("", " ", null);
     }
