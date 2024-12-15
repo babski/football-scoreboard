@@ -9,6 +9,9 @@ record Match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
         if (awayTeam == null || awayTeam.isBlank()) {
             throw new IllegalArgumentException("Away team cannot be null or blank");
         }
+        if (homeTeam.equals(awayTeam)) {
+            throw new IllegalArgumentException("Home and away teams cannot be the same");
+        }
     }
 
     Match(String homeTeam, String awayTeam) {

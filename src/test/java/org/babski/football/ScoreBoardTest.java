@@ -49,6 +49,14 @@ class ScoreBoardTest {
         assertEquals(0, scoreBoard.getSummary().size());
     }
 
+    @Test
+    void matchCreationWithTheSameTeamsThrowsAnException() {
+        // When & Then
+        var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.startMatch(ANY_HOME_TEAM, ANY_HOME_TEAM));
+        assertEquals("Home and away teams cannot be the same", exception.getMessage());
+        assertEquals(0, scoreBoard.getSummary().size());
+    }
+
     static Stream<String> blankAndNullStringProvider() {
         return Stream.of("", " ", null);
     }
