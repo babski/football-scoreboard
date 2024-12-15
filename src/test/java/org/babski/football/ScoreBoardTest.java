@@ -40,6 +40,15 @@ class ScoreBoardTest {
         assertEquals(0, scoreBoard.getSummary().size());
     }
 
+    @ParameterizedTest
+    @MethodSource("blankAndNullStringProvider")
+    void matchCreationWithNullOrBlankAwayTeamThrowsAnException(String awayTeam) {
+        // When & Then
+        var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.startMatch(ANY_HOME_TEAM, awayTeam));
+        assertEquals("Away team cannot be null or blank", exception.getMessage());
+        assertEquals(0, scoreBoard.getSummary().size());
+    }
+
     static Stream<String> blankAndNullStringProvider() {
         return Stream.of("", " ", null);
     }
