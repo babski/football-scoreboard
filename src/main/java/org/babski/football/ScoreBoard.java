@@ -1,5 +1,6 @@
 package org.babski.football;
 
+
 import java.util.List;
 
 public interface ScoreBoard {
@@ -7,4 +8,8 @@ public interface ScoreBoard {
     void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore);
     void finishMatch(String homeTeam, String awayTeam);
     List<String> getSummary();
+
+    static ScoreBoard getSimpleScoreBoard() {
+        return new SimpleScoreBoard();
+    }
 }
