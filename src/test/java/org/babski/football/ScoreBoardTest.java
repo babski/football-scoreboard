@@ -34,7 +34,7 @@ class ScoreBoardTest {
 
     @ParameterizedTest
     @MethodSource("blankAndNullStringProvider")
-    void matchCreationWithNullOrBlankHomeTeamThrowsAnException(String homeTeam) {
+    void startingMatchForNullOrBlankHomeTeamThrowsAnException(String homeTeam) {
         // When & Then
         var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.startMatch(homeTeam, ANY_AWAY_TEAM));
         assertEquals("Home team cannot be null or blank", exception.getMessage());
@@ -43,7 +43,7 @@ class ScoreBoardTest {
 
     @ParameterizedTest
     @MethodSource("blankAndNullStringProvider")
-    void matchCreationWithNullOrBlankAwayTeamThrowsAnException(String awayTeam) {
+    void startingMatchForNullOrBlankAwayTeamThrowsAnException(String awayTeam) {
         // When & Then
         var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.startMatch(ANY_HOME_TEAM, awayTeam));
         assertEquals("Away team cannot be null or blank", exception.getMessage());
@@ -51,11 +51,27 @@ class ScoreBoardTest {
     }
 
     @Test
-    void matchCreationWithTheSameTeamsThrowsAnException() {
+    void startingMatchForTheSameTeamsThrowsAnException() {
         // When & Then
         var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.startMatch(ANY_HOME_TEAM, ANY_HOME_TEAM));
         assertEquals("Home and away teams cannot be the same", exception.getMessage());
         assertEquals(0, scoreBoard.getSummary().size());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Mexico,Brazil,Mexico team(s) already included in scoreboard",
+            "Brazil,Mexico,Mexico team(s) already included in scoreboard",
+            "Canada,Brazil,Canada team(s) already included in scoreboard",
+            "Brazil,Canada,Canada team(s) already included in scoreboard",
+            "Canada,Mexico,Canada and Mexico team(s) already included in scoreboard"
+    })
+    void startingMatchForTeamsAlreadyInScoreBoardThrowsAnException(String homeTeam, String awayTeam, String message) {
+        // Given
+        scoreBoard.startMatch("Mexico", "Canada");
+
+        // When & Then
+        var exception = assertThrows(IllegalArgumentException.class, () -> scoreBoard.startMatch(homeTeam, awayTeam));
+        assertEquals(message, exception.getMessage());
     }
 
     @Test
