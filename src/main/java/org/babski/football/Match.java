@@ -1,6 +1,8 @@
 package org.babski.football;
 
-record Match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
+import java.time.Instant;
+
+record Match(String homeTeam, String awayTeam, int homeScore, int awayScore, Instant startTime) {
 
     Match {
         if (homeTeam == null || homeTeam.isBlank()) {
@@ -17,8 +19,8 @@ record Match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
         }
     }
 
-    Match(String homeTeam, String awayTeam) {
-        this(homeTeam, awayTeam, 0, 0);
+    Match(String homeTeam, String awayTeam, Instant startTime) {
+        this(homeTeam, awayTeam, 0, 0, startTime);
     }
 
     @Override
